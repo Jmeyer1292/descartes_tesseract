@@ -4,6 +4,8 @@
 #include <descartes_core/robot_model.h>
 #include <opw_kinematics/opw_parameters.h>
 #include <tesseract_ros/ros_basic_env.h>
+#include <descartes_core/trajectory_pt.h>
+
 
 namespace descartes_tesseract
 {
@@ -36,6 +38,12 @@ public:
 
 private:
   tesseract::BasicEnvPtr collision_env_ptr_;
+  opw_kinematics::Parameters<double> kin_params_;
+  tesseract::BasicKinConstPtr manipulator_;
+  std::string kin_base_frame_;
+  std::string kin_tool_frame_;
+  descartes_core::Frame world_to_base_;
+  descartes_core::Frame tool0_to_tip_;
 };
 
 }
