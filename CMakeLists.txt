@@ -39,6 +39,16 @@ target_link_libraries(${PROJECT_NAME}
   ${catkin_LIBRARIES}
 )
 
+add_library(${PROJECT_NAME}_test
+ src/model_test.cpp
+)
+
+add_dependencies(${PROJECT_NAME}_test ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+target_link_libraries(${PROJECT_NAME}_test
+  ${catkin_LIBRARIES}
+)
+
 #############
 ## Install ##
 #############
