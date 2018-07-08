@@ -39,7 +39,7 @@ target_link_libraries(${PROJECT_NAME}
   ${catkin_LIBRARIES}
 )
 
-add_library(${PROJECT_NAME}_test
+add_executable(${PROJECT_NAME}_test
  src/model_test.cpp
 )
 
