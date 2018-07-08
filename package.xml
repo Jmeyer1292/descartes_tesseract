@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>descartes_tesseract</name>
+  <version>0.0.0</version>
+  <description>The descartes_tesseract package</description>
+
+  <maintainer email="jmeyer@todo.todo">jmeyer</maintainer>
+
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>descartes_core</depend>
+  <depend>opw_kinematics</depend>
+  <depend>tesseract_ros</depend>
+
+</package>
