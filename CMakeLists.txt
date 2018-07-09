@@ -47,6 +47,7 @@ add_dependencies(${PROJECT_NAME}_test ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catk
 
 target_link_libraries(${PROJECT_NAME}_test
   ${catkin_LIBRARIES}
+  ${PROJECT_NAME}
 )
 
 #############

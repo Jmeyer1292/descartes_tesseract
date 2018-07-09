@@ -124,14 +124,21 @@ int descartes_tesseract::TesseractStateAdapter::getDOF() const
 
 bool descartes_tesseract::TesseractStateAdapter::isValid(const std::vector<double>& joint_pose) const
 {
+  // TODO: checkJoints does not return false...
   // check limits
-  Eigen::Map<const Eigen::VectorXd> jnts (joint_pose.data(), joint_pose.size());
-  const bool in_joint_limits = manipulator_->checkJoints(jnts);
+  // Eigen::Map<const Eigen::VectorXd> jnts (joint_pose.data(), joint_pose.size());
+//   const bool in_joint_limits = manipulator_->checkJoints(jnts);
+
+  const auto& limits = manipulator_->getLimits();
+  for (std::size_t i = 0; i < joint_pose.size(); ++i)
+  {
+    if (joint_pose[i] < limits(i, 0) || joint_pose[i] > limits(i, 1)) return false;
+  }
 
   // check collision
   // TODO
 
-  return in_joint_limits;
+  return true;
 }
 
 bool descartes_tesseract::TesseractStateAdapter::isValid(const Eigen::Affine3d& pose) const
