@@ -21,7 +21,7 @@ int main(int argc, char** argv)
   ROS_INFO_STREAM("Robot has: " << model.getDOF() << " dofs");
 
   // Solve IK
-  Eigen::Affine3d tp = Eigen::Affine3d::Identity() * Eigen::Translation3d(1.0, 0, 1.0) *Eigen::AngleAxisd(M_PI, Eigen::Vector3d::UnitY());
+  Eigen::Affine3d tp = Eigen::Affine3d::Identity() * Eigen::Translation3d(1.0, 0, 1.0) * Eigen::AngleAxisd(M_PI, Eigen::Vector3d::UnitY());
   std::vector<std::vector<double>> joint_poses;
   model.getAllIK(tp, joint_poses);
 

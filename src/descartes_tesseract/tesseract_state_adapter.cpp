@@ -74,9 +74,19 @@ bool descartes_tesseract::TesseractStateAdapter::getIK(const Eigen::Affine3d& po
   return false;
 }
 
+static void printVector(const std::string& name, const std::vector<double>& v)
+{
+  std::stringstream ss;
+  ss << name << ": [";
+  for (auto&& a : v) ss << a << ", ";
+  ss << "]";
+  ROS_INFO_STREAM(ss.str());
+}
+
 bool descartes_tesseract::TesseractStateAdapter::getAllIK(const Eigen::Affine3d& pose,
                                                           std::vector<std::vector<double>>& joint_poses) const
 {
+  ROS_WARN("new solve");
   joint_poses.clear();
 
   // Transform input pose
@@ -96,8 +106,14 @@ bool descartes_tesseract::TesseractStateAdapter::getAllIK(const Eigen::Affine3d&
 
       // TODO: make this better...
       std::copy(sol, sol + 6, tmp.data());
+      printVector("testing...", tmp);
       if (isValid(tmp))
       {
+        printVector("accepted!", tmp);
+
+        Eigen::Affine3d pose = opw_kinematics::forward(kin_params_, tmp.data());
+        ROS_INFO_STREAM("pose:\n" << pose.matrix());
+
         joint_poses.push_back(tmp);
       }
     }
@@ -124,21 +140,8 @@ int descartes_tesseract::TesseractStateAdapter::getDOF() const
 
 bool descartes_tesseract::TesseractStateAdapter::isValid(const std::vector<double>& joint_pose) const
 {
-  // TODO: checkJoints does not return false...
-  // check limits
-  // Eigen::Map<const Eigen::VectorXd> jnts (joint_pose.data(), joint_pose.size());
-//   const bool in_joint_limits = manipulator_->checkJoints(jnts);
-
-  const auto& limits = manipulator_->getLimits();
-  for (std::size_t i = 0; i < joint_pose.size(); ++i)
-  {
-    if (joint_pose[i] < limits(i, 0) || joint_pose[i] > limits(i, 1)) return false;
-  }
-
   // check collision
-  // TODO
-
-  return true;
+  return inLimits(joint_pose) && !isInCollision(joint_pose);
 }
 
 bool descartes_tesseract::TesseractStateAdapter::isValid(const Eigen::Affine3d& pose) const
@@ -156,4 +159,40 @@ std::vector<double> descartes_tesseract::TesseractStateAdapter::getJointVelocity
   // TODO
   std::vector<double> limits (getDOF(), 1.0);
   return limits;
+}
+
+bool descartes_tesseract::TesseractStateAdapter::inLimits(const std::vector<double>& joints) const
+{
+  const auto& limits = manipulator_->getLimits();
+  for (std::size_t i = 0; i < joints.size(); ++i)
+  {
+    if (joints[i] < limits(i, 0) || joints[i] > limits(i, 1)) return false;
+  }
+
+  return true;
+}
+
+bool descartes_tesseract::TesseractStateAdapter::isInCollision(const std::vector<double>& joints) const
+{
+  tesseract::ContactRequest req;
+  req.link_names = manipulator_->getLinkNames();
+  req.type = tesseract::ContactRequestType::SINGLE;
+  auto fn = std::bind(&TesseractStateAdapter::isContactAllowed, this, std::placeholders::_1, std::placeholders::_2);
+  req.isContactAllowed = fn;
+
+  const auto& joint_names = manipulator_->getJointNames();
+  Eigen::Map<const Eigen::VectorXd> jnts (joints.data(), joints.size());
+
+  tesseract::ContactResultMap contact_map;
+  collision_env_ptr_->calcCollisionsDiscrete(req, joint_names, jnts, contact_map);
+
+  if (contact_map.size() > 0) {
+    return true;
+  }
+  return false;
+}
+
+bool descartes_tesseract::TesseractStateAdapter::isContactAllowed(const std::string& a, const std::string& b) const
+{
+  return collision_env_ptr_->getAllowedCollisionMatrix()->isCollisionAllowed(a, b);
 }

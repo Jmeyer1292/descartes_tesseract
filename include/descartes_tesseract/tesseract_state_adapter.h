@@ -37,6 +37,10 @@ public:
   std::vector<double> getJointVelocityLimits() const override;
 
 private:
+  bool inLimits(const std::vector<double>& joints) const;
+  bool isInCollision(const std::vector<double>& joints) const;
+  bool isContactAllowed(const std::string& a, const std::string& b) const;
+
   tesseract::BasicEnvPtr collision_env_ptr_;
   opw_kinematics::Parameters<double> kin_params_;
   tesseract::BasicKinConstPtr manipulator_;
