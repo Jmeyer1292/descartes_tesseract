@@ -86,7 +86,7 @@ static void printVector(const std::string& name, const std::vector<double>& v)
 bool descartes_tesseract::TesseractStateAdapter::getAllIK(const Eigen::Affine3d& pose,
                                                           std::vector<std::vector<double>>& joint_poses) const
 {
-  ROS_WARN("new solve");
+//  ROS_WARN("new solve");
   joint_poses.clear();
 
   // Transform input pose
@@ -106,13 +106,13 @@ bool descartes_tesseract::TesseractStateAdapter::getAllIK(const Eigen::Affine3d&
 
       // TODO: make this better...
       std::copy(sol, sol + 6, tmp.data());
-      printVector("testing...", tmp);
+//      printVector("testing...", tmp);
       if (isValid(tmp))
       {
-        printVector("accepted!", tmp);
+//        printVector("accepted!", tmp);
 
-        Eigen::Affine3d pose = opw_kinematics::forward(kin_params_, tmp.data());
-        ROS_INFO_STREAM("pose:\n" << pose.matrix());
+//        Eigen::Affine3d pose = opw_kinematics::forward(kin_params_, tmp.data());
+//        ROS_INFO_STREAM("pose:\n" << pose.matrix());
 
         joint_poses.push_back(tmp);
       }
